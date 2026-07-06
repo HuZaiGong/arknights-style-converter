@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RHODES TERMINAL / 文风转换</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero-panel" aria-labelledby="page-title">
+        <div class="panel-marker">SYS-PRTS / CN-TEXT TRANSFORM</div>
+        <div class="hero-grid">
+          <div>
+            <p class="eyebrow"><span></span>RHODES ISLAND COMMUNICATION NODE</p>
+            <h1 id="page-title">罗德岛式文风转换终端</h1>
+            <p class="brief">输入一句普通表达，终端会将其重构为更冷峻、克制、带有作战记录质感的明日方舟式中文。</p>
+          </div>
+          <div class="status-board" aria-label="终端状态">
+            <div><span>API</span><strong>ONLINE</strong></div>
+            <div><span>FORMAT</span><strong>CHAT</strong></div>
+            <div><span>MODE</span><strong>STYLE</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="workspace" aria-label="转换工作区">
+        <form class="converter" id="converterForm">
+          <div class="module-head">
+            <div>
+              <span class="module-code">INPUT-01</span>
+              <h2>原始通信</h2>
+            </div>
+            <span class="signal-dot"></span>
+          </div>
+
+          <label class="field-label" for="inputText">待转换文本</label>
+          <textarea id="inputText" name="inputText" maxlength="4000" placeholder="例如：今天的事情很多，但我会尽力处理完。"></textarea>
+          <div class="meta-row">
+            <span id="charCount">0 / 4000</span>
+            <button class="text-button" type="button" id="sampleButton">载入样例</button>
+          </div>
+
+          <div class="control-grid">
+            <label class="control-block" for="personaSelect">
+              <span>语气预设</span>
+              <select id="personaSelect" name="persona">
+                <option value="terminal">罗德岛终端</option>
+                <option value="amiya">阿米娅式</option>
+                <option value="kaltsit">凯尔希式</option>
+                <option value="w">W式</option>
+                <option value="silverash">银灰式</option>
+                <option value="exusiai">能天使式</option>
+              </select>
+            </label>
+            <label class="control-block" for="intensityRange">
+              <span>风格强度 <b id="intensityValue">65</b></span>
+              <input id="intensityRange" name="intensity" type="range" min="10" max="100" value="65">
+            </label>
+          </div>
+
+          <button class="primary-action" type="submit" id="submitButton">
+            <span>执行转换</span>
+            <small>DEPLOY</small>
+          </button>
+        </form>
+
+        <section class="output-panel" aria-live="polite">
+          <div class="module-head">
+            <div>
+              <span class="module-code">OUTPUT-02</span>
+              <h2>转换结果</h2>
+            </div>
+            <button class="copy-button" type="button" id="copyButton" disabled>复制</button>
+          </div>
+          <div class="result-box" id="resultBox">
+            <p class="placeholder">等待输入。终端将返回重构后的通信文本。</p>
+          </div>
+          <div class="error-line" id="errorLine" role="alert"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
