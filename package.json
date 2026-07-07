@@ -3,7 +3,7 @@
   "scripts": {
     "start": "node server.js",
     "dev:vercel": "vercel dev",
-    "check": "node --check config.js && node --check app.js && node --check server.js && node --check worker.js && node --check api/transform.js"
+    "check": "node --check operatorStyles.js && node --check config.js && node --check app.js && node --check server.js && node --check worker.js && node --check api/transform.js"
   },
   "engines": {
     "node": ">=18"

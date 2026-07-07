@@ -1,3 +1,5 @@
+import { operatorPersonas } from "./operatorStyles.js";
+
 export const appDefaults = {
   apiBaseUrl: "https://kenari.id/v1",
   apiKey: "kn-1f8111f1f7d17bd76aae6bae01a90fc4188ff278b2ac4190",
@@ -17,7 +19,7 @@ export const appDefaults = {
   allowedApiHosts: ["kenari.id"]
 };
 
-export const personas = {
+export const basePersonas = {
   terminal: {
     name: "罗德岛终端",
     instruction:
@@ -48,6 +50,13 @@ export const personas = {
     instruction:
       "语气轻快、直率、有行动力；保留乐观节奏，但仍套入罗德岛任务与城市危机的语境。"
   }
+};
+
+export const personas = {
+  ...Object.fromEntries(
+    Object.entries(basePersonas).map(([id, persona]) => [id, { ...persona, group: "通用预设" }])
+  ),
+  ...operatorPersonas
 };
 
 export const errorMessages = {
@@ -188,6 +197,17 @@ export function classifyUpstreamError(status, data) {
   return makeError("upstream_error", 502);
 }
 
+export function personaOptions() {
+  return Object.entries(personas).map(([id, persona]) => ({
+    id,
+    name: persona.name,
+    group: persona.group || "通用预设",
+    faction: persona.faction || "",
+    class: persona.class || "",
+    rarity: persona.rarity || null
+  }));
+}
+
 export function publicAppConfig() {
   return {
     defaultApiBaseUrl: appDefaults.apiBaseUrl,
@@ -195,6 +215,7 @@ export function publicAppConfig() {
     defaultModel: appDefaults.model,
     workerEndpoint: appDefaults.workerEndpoint,
     vercelEndpoint: appDefaults.vercelEndpoint,
-    maxInputLength: appDefaults.maxInputLength
+    maxInputLength: appDefaults.maxInputLength,
+    personas: personaOptions()
   };
 }

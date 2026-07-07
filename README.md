@@ -33,6 +33,7 @@ https://github.com/HuZaiGong/arknights-style-converter
   - Exusiai-style
 - Style intensity slider.
 - Gear menu for API URL, API key, and model settings.
+- Operator style presets powered by reusable style archetypes.
 - Copy-to-clipboard output.
 - Local Node proxy for development.
 - Vercel API proxy for production.
@@ -79,12 +80,28 @@ Browser on GitHub Pages
 - `styles.css` - Tactical industrial/HUD-style UI.
 - `app.js` - Browser interaction, settings menu, and endpoint selection.
 - `config.js` - Shared defaults, persona prompts, validation, and error messages.
+- `operatorStyles.js` - Operator style archetypes and operator persona data.
 - `api/transform.js` - Vercel Serverless Function API proxy.
 - `server.js` - Local development static server and API proxy.
 - `worker.js` - Cloudflare Worker API proxy for GitHub Pages fallback.
 - `vercel.json` - Vercel function configuration.
 - `wrangler.toml` - Cloudflare Worker deployment config.
 - `DesignLanguage.txt` - UI design reference notes.
+
+## Operator Styles
+
+Operator presets are defined in `operatorStyles.js`.
+
+The file separates reusable style archetypes from individual operator metadata:
+
+```text
+styleArchetypes -> broad tone templates
+operators        -> operator name, faction, class, rarity, tags, modifiers
+```
+
+This keeps the project maintainable as the operator list grows. To add more operators, append entries to `operators` and reuse an existing `archetype` where possible. Only create a new archetype when the existing tone templates cannot describe the operator well.
+
+The first batch includes representative operators such as Amiya, Kal'tsit, Ch'en, Exusiai, Texas, Lappland, SilverAsh, Surtr, Ling, Nian, Dusk, W, Ines, Eyjafjalla, Saria, Skadi the Corrupting Heart, Flametail, Mlynar, and Thorns.
 
 ## Settings
 

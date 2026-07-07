@@ -31,6 +31,33 @@ const SETTINGS_KEY = "arknights-style-converter-settings";
 const sampleText = "今天的事情很多，但我会尽力处理完。请大家先保持冷静，等我把重要事项排好顺序。";
 let currentResult = "";
 
+function renderPersonaOptions() {
+  personaSelect.innerHTML = "";
+  const groups = new Map();
+
+  for (const persona of config.personas) {
+    const groupName = persona.group || "通用预设";
+    if (!groups.has(groupName)) groups.set(groupName, []);
+    groups.get(groupName).push(persona);
+  }
+
+  for (const [groupName, items] of groups) {
+    const optionGroup = document.createElement("optgroup");
+    optionGroup.label = groupName;
+
+    for (const persona of items) {
+      const option = document.createElement("option");
+      option.value = persona.id;
+      option.textContent = persona.group === "干员风格" && persona.faction
+        ? `${persona.name} / ${persona.faction}`
+        : persona.name;
+      optionGroup.append(option);
+    }
+
+    personaSelect.append(optionGroup);
+  }
+}
+
 function defaultSettings() {
   return {
     apiBaseUrl: config.defaultApiBaseUrl,
@@ -223,5 +250,6 @@ document.addEventListener("keydown", event => {
   }
 });
 
+renderPersonaOptions();
 fillSettingsForm();
 updateInputStats();
