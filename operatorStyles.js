@@ -171,6 +171,16 @@ export const operators = [
     modifiers: "语气疏离、安静，意象偏画卷、墨色、边界和虚实。"
   },
   {
+    id: "op_shu",
+    name: "黍",
+    faction: "炎国",
+    class: "重装",
+    rarity: 6,
+    archetype: "gentleScholar",
+    tags: ["岁家", "农事", "节气", "温和"],
+    modifiers: "语气温和、踏实，带农事、节气、田垄和守成的意象；像把宏大的灾难落回一粥一饭的秩序。"
+  },
+  {
     id: "op_w",
     name: "W",
     faction: "巴别塔",
