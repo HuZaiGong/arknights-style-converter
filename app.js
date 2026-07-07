@@ -11,6 +11,11 @@ const intensityRange = document.querySelector("#intensityRange");
 const intensityValue = document.querySelector("#intensityValue");
 const submitButton = document.querySelector("#submitButton");
 const resultBox = document.querySelector("#resultBox");
+const profileName = document.querySelector("#profileName");
+const profileDetails = document.querySelector("#profileDetails");
+const profileTags = document.querySelector("#profileTags");
+const requestEndpoint = document.querySelector("#requestEndpoint");
+const requestDetails = document.querySelector("#requestDetails");
 const errorLine = document.querySelector("#errorLine");
 const charCount = document.querySelector("#charCount");
 const copyButton = document.querySelector("#copyButton");
@@ -37,6 +42,61 @@ let selectedPersonaId = "terminal";
 let personaSearchQuery = "";
 let personaCategoryFilter = "all";
 let currentResult = "";
+
+function renderKeyValueList(container, entries) {
+  container.innerHTML = "";
+
+  for (const [label, value] of entries) {
+    const item = document.createElement("div");
+    item.className = "intel-item";
+
+    const key = document.createElement("span");
+    key.textContent = label;
+    item.append(key);
+
+    const val = document.createElement("strong");
+    val.textContent = value || "-";
+    item.append(val);
+
+    container.append(item);
+  }
+}
+
+function updateProfilePanel(persona = config.personas[0]) {
+  profileName.textContent = persona.name;
+
+  renderKeyValueList(profileDetails, [
+    ["类型", persona.group || "通用预设"],
+    ["阵营", persona.faction || "-"],
+    ["职业", persona.class || "-"],
+    ["稀有度", persona.rarity ? `${persona.rarity}★` : "-"]
+  ]);
+
+  profileTags.innerHTML = "";
+  const tags = persona.tags?.length ? persona.tags : [persona.archetype || "通用"];
+  for (const tag of tags.slice(0, 6)) {
+    const chip = document.createElement("span");
+    chip.textContent = tag;
+    profileTags.append(chip);
+  }
+}
+
+function endpointLabel() {
+  if (isGitHubPages) return "WORKER";
+  if (isLocalhost) return "LOCAL";
+  return "VERCEL";
+}
+
+function updateRequestPanel() {
+  const settings = loadSettings();
+  requestEndpoint.textContent = endpointLabel();
+  renderKeyValueList(requestDetails, [
+    ["强度", intensityRange.value],
+    ["模型", settings.model],
+    ["API", settings.apiBaseUrl],
+    ["Endpoint", TRANSFORM_ENDPOINT]
+  ]);
+}
 
 function personaMeta(persona) {
   const meta = [];
@@ -87,6 +147,7 @@ function selectPersona(personaId) {
   personaCurrent.textContent = persona.group === "干员风格" && persona.faction
     ? `${persona.name} / ${personaMeta(persona)}`
     : persona.name;
+  updateProfilePanel(persona);
   renderPersonaResults();
 }
 
@@ -187,6 +248,7 @@ function userMessageFromError(data, fallback) {
 
 function setBusy(isBusy) {
   submitButton.disabled = isBusy;
+  resultBox.classList.toggle("is-generating", isBusy);
   submitButton.querySelector("span").textContent = isBusy ? "转换中" : "执行转换";
   submitButton.querySelector("small").textContent = isBusy ? "SYNC" : "DEPLOY";
 }
@@ -228,6 +290,7 @@ async function transformText(event) {
   }
 
   setBusy(true);
+  updateRequestPanel();
   setError("");
   setResult("正在接入罗德岛通信节点，请稍候...");
 
@@ -300,6 +363,7 @@ personaFilterButtons.forEach(button => {
 inputText.addEventListener("input", updateInputStats);
 intensityRange.addEventListener("input", () => {
   intensityValue.textContent = intensityRange.value;
+  updateRequestPanel();
 });
 copyButton.addEventListener("click", copyResult);
 sampleButton.addEventListener("click", () => {
@@ -312,6 +376,7 @@ settingsButton.addEventListener("click", () => toggleSettings());
 settingsForm.addEventListener("submit", event => {
   event.preventDefault();
   saveSettings(readSettingsForm());
+  updateRequestPanel();
   setSettingsStatus("配置已保存");
   window.setTimeout(() => setSettingsStatus(""), 1600);
 });
@@ -319,6 +384,7 @@ resetSettingsButton.addEventListener("click", () => {
   const settings = defaultSettings();
   saveSettings(settings);
   fillSettingsForm(settings);
+  updateRequestPanel();
   setSettingsStatus("已恢复默认配置");
   window.setTimeout(() => setSettingsStatus(""), 1600);
 });
@@ -335,4 +401,5 @@ document.addEventListener("keydown", event => {
 
 renderPersonaOptions();
 fillSettingsForm();
+updateRequestPanel();
 updateInputStats();
