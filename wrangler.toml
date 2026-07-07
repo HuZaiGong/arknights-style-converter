@@ -1,0 +1,4 @@
+name = "arknights-style-converter-api"
+main = "worker.js"
+compatibility_date = "2026-07-07"
+workers_dev = true
