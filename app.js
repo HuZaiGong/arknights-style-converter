@@ -10,7 +10,11 @@ const charCount = document.querySelector("#charCount");
 const copyButton = document.querySelector("#copyButton");
 const sampleButton = document.querySelector("#sampleButton");
 
-const TRANSFORM_ENDPOINT = "https://arknights-style-converter-api.1421201386.workers.dev/api/transform";
+const WORKER_ENDPOINT = "https://arknights-style-converter-api.1421201386.workers.dev/api/transform";
+const LOCAL_ENDPOINT = "/api/transform";
+const TRANSFORM_ENDPOINT = ["localhost", "127.0.0.1"].includes(window.location.hostname)
+  ? LOCAL_ENDPOINT
+  : WORKER_ENDPOINT;
 const sampleText = "今天的事情很多，但我会尽力处理完。请大家先保持冷静，等我把重要事项排好顺序。";
 let currentResult = "";
 
