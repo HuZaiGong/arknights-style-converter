@@ -8,6 +8,7 @@ export const appDefaults = {
   requestTimeoutMs: 45000,
   maxBodyBytes: 64 * 1024,
   workerEndpoint: "https://arknights-style-converter-api.1421201386.workers.dev/api/transform",
+  vercelEndpoint: "/api/transform",
   allowedOrigins: [
     "https://huzaigong.github.io",
     "http://127.0.0.1:4173",
@@ -193,6 +194,7 @@ export function publicAppConfig() {
     defaultApiKey: appDefaults.apiKey,
     defaultModel: appDefaults.model,
     workerEndpoint: appDefaults.workerEndpoint,
+    vercelEndpoint: appDefaults.vercelEndpoint,
     maxInputLength: appDefaults.maxInputLength
   };
 }

@@ -22,9 +22,11 @@ const settingsStatus = document.querySelector("#settingsStatus");
 
 const config = publicAppConfig();
 const LOCAL_ENDPOINT = "/api/transform";
-const TRANSFORM_ENDPOINT = ["localhost", "127.0.0.1"].includes(window.location.hostname)
-  ? LOCAL_ENDPOINT
-  : config.workerEndpoint;
+const isLocalhost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+const isGitHubPages = window.location.hostname.endsWith("github.io");
+const TRANSFORM_ENDPOINT = isGitHubPages
+  ? config.workerEndpoint
+  : (isLocalhost ? LOCAL_ENDPOINT : config.vercelEndpoint);
 const SETTINGS_KEY = "arknights-style-converter-settings";
 const sampleText = "今天的事情很多，但我会尽力处理完。请大家先保持冷静，等我把重要事项排好顺序。";
 let currentResult = "";
