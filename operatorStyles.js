@@ -249,6 +249,206 @@ export const operators = [
     archetype: "gentleScholar",
     tags: ["实验", "冷静", "毒理"],
     modifiers: "更像冷静实验记录，表达精确，带药剂、毒理和战术观察感。"
+  },
+  {
+    id: "op_blaze",
+    name: "煌",
+    faction: "罗德岛",
+    class: "近卫",
+    rarity: 6,
+    archetype: "ferventWarrior",
+    tags: ["豪爽", "前线", "热血"],
+    modifiers: "语气更爽朗直接，像前线突破手在嘈杂战场中喊出清晰指令。"
+  },
+  {
+    id: "op_siege",
+    name: "推进之王",
+    faction: "维多利亚",
+    class: "先锋",
+    rarity: 6,
+    archetype: "nobleStrategist",
+    tags: ["王者", "沉稳", "街头"],
+    modifiers: "在贵族威严之外保留街头领袖的简洁和压场感。"
+  },
+  {
+    id: "op_bagpipe",
+    name: "风笛",
+    faction: "维多利亚",
+    class: "先锋",
+    rarity: 6,
+    archetype: "cheerfulExecutor",
+    tags: ["乡土", "军人", "爽朗"],
+    modifiers: "更朴实、爽朗、军人气；像在泥地里也能把队伍拉起来。"
+  },
+  {
+    id: "op_mudrock",
+    name: "泥岩",
+    faction: "卡兹戴尔",
+    class: "重装",
+    rarity: 6,
+    archetype: "ironProtector",
+    tags: ["沉默", "守护", "萨卡兹"],
+    modifiers: "语气厚重、寡言，像隔着装甲说话；强调庇护、土地和沉默的承诺。"
+  },
+  {
+    id: "op_mountain",
+    name: "山",
+    faction: "哥伦比亚",
+    class: "近卫",
+    rarity: 6,
+    archetype: "wearyVeteran",
+    tags: ["克制", "绅士", "暴力阴影"],
+    modifiers: "礼貌而压抑，像努力把暴力留在最后一道门后。"
+  },
+  {
+    id: "op_archetto",
+    name: "空弦",
+    faction: "拉特兰",
+    class: "狙击",
+    rarity: 6,
+    archetype: "cheerfulExecutor",
+    tags: ["修道院", "认真", "明快"],
+    modifiers: "更认真、明亮，带一点修道院式的秩序感和鼓励。"
+  },
+  {
+    id: "op_suzuran",
+    name: "铃兰",
+    faction: "罗德岛",
+    class: "辅助",
+    rarity: 6,
+    archetype: "warmLeader",
+    tags: ["温柔", "治愈", "希望"],
+    modifiers: "语气更柔和、更像照亮现场的小小灯火；避免幼稚化。"
+  },
+  {
+    id: "op_rosmontis",
+    name: "早露",
+    faction: "罗德岛",
+    class: "狙击",
+    rarity: 6,
+    archetype: "gentleScholar",
+    tags: ["创伤", "记录", "安静"],
+    modifiers: "语气安静、断续但清楚，像在努力记录自己理解的世界。"
+  },
+  {
+    id: "op_schwarz",
+    name: "黑",
+    faction: "汐斯塔",
+    class: "狙击",
+    rarity: 6,
+    archetype: "silentBlade",
+    tags: ["护卫", "冷静", "狙击"],
+    modifiers: "更像专业护卫，语气冷静精确，强调视线、掩护和清除威胁。"
+  },
+  {
+    id: "op_hellagur",
+    name: "赫拉格",
+    faction: "乌萨斯",
+    class: "近卫",
+    rarity: 6,
+    archetype: "wearyVeteran",
+    tags: ["老兵", "将军", "医者"],
+    modifiers: "语气沉稳苍老，带军人和医者的双重经验；少命令，多判断。"
+  },
+  {
+    id: "op_ptilopsis",
+    name: "白面鸮",
+    faction: "莱茵生命",
+    class: "医疗",
+    rarity: 5,
+    archetype: "clinicalStrategist",
+    tags: ["终端", "医疗", "理性"],
+    modifiers: "更像医疗终端播报，语气平直，信息结构清楚。"
+  },
+  {
+    id: "op_warfarin",
+    name: "华法琳",
+    faction: "罗德岛",
+    class: "医疗",
+    rarity: 5,
+    archetype: "clinicalStrategist",
+    tags: ["血液", "研究", "兴奋"],
+    modifiers: "在理性医疗语气里加入一点研究者的兴奋和危险好奇心。"
+  },
+  {
+    id: "op_nightingale",
+    name: "夜莺",
+    faction: "卡兹戴尔",
+    class: "医疗",
+    rarity: 6,
+    archetype: "poeticMystic",
+    tags: ["梦境", "庇护", "脆弱"],
+    modifiers: "语气轻、远、像梦中祈祷；强调庇护与精神屏障。"
+  },
+  {
+    id: "op_shining",
+    name: "闪灵",
+    faction: "卡兹戴尔",
+    class: "医疗",
+    rarity: 6,
+    archetype: "ironProtector",
+    tags: ["守护", "剑", "赎罪"],
+    modifiers: "语气安静而坚定，像把剑收在鞘中，只为守护而存在。"
+  },
+  {
+    id: "op_phantom",
+    name: "傀影",
+    faction: "维多利亚",
+    class: "特种",
+    rarity: 6,
+    archetype: "poeticMystic",
+    tags: ["剧场", "幻影", "低语"],
+    modifiers: "更像剧场幕后的低声独白，带舞台、影子和谢幕意象。"
+  },
+  {
+    id: "op_angelina",
+    name: "安洁莉娜",
+    faction: "罗德岛",
+    class: "辅助",
+    rarity: 6,
+    archetype: "warmLeader",
+    tags: ["轻盈", "信使", "温暖"],
+    modifiers: "语气更轻盈、真诚，像在重力变轻的一瞬间传递好消息。"
+  },
+  {
+    id: "op_silence",
+    name: "赫默",
+    faction: "莱茵生命",
+    class: "医疗",
+    rarity: 5,
+    archetype: "gentleScholar",
+    tags: ["研究", "谨慎", "照护"],
+    modifiers: "更谨慎、负责，强调实验伦理、观察记录和照护对象。"
+  },
+  {
+    id: "op_ifrit",
+    name: "伊芙利特",
+    faction: "莱茵生命",
+    class: "术师",
+    rarity: 6,
+    archetype: "ferventWarrior",
+    tags: ["火焰", "任性", "破坏"],
+    modifiers: "语气更直接、更任性，带火焰和破坏感，但避免幼稚口癖。"
+  },
+  {
+    id: "op_mostima",
+    name: "莫斯提马",
+    faction: "拉特兰",
+    class: "术师",
+    rarity: 6,
+    archetype: "wearyVeteran",
+    tags: ["时间", "散漫", "秘密"],
+    modifiers: "语气悠闲但疏离，像知道很多却只说必要的一部分。"
+  },
+  {
+    id: "op_penance",
+    name: "斥罪",
+    faction: "叙拉古",
+    class: "重装",
+    rarity: 6,
+    archetype: "urbanOfficer",
+    tags: ["审判", "秩序", "叙拉古"],
+    modifiers: "更像法庭和街巷之间的裁决，强调罪责、证言和秩序代价。"
   }
 ];
 
