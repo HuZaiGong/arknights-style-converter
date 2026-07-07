@@ -1,183 +1,198 @@
-# Arknights Style Converter
+# 明日方舟式文风转换器
 
-A small web tool that rewrites Chinese text into an Arknights-inspired tactical terminal style. The primary deployment target is Vercel, where the static frontend and `/api/transform` proxy run under the same origin.
+一个把中文文本改写成明日方舟式战术终端风格的小工具。当前主部署目标是 Vercel，前端静态页面和 `/api/transform` API 代理在同一个域名下运行。
 
-Primary Vercel site:
+主站地址：
 
 ```text
 https://arknights-style-converter.vercel.app
 ```
 
-Fallback GitHub Pages site:
+备用 GitHub Pages 地址：
 
 ```text
 https://huzaigong.github.io/arknights-style-converter/
 ```
 
-Repository:
+仓库地址：
 
 ```text
 https://github.com/HuZaiGong/arknights-style-converter
 ```
 
-## Features
+## 功能
 
-- Text-to-style conversion for Chinese input.
-- Arknights-inspired UI based on the local `DesignLanguage.txt` notes.
-- Built-in tone presets:
-  - Rhodes Island Terminal
-  - Amiya-style
-  - Kal'tsit-style
-  - W-style
-  - SilverAsh-style
-  - Exusiai-style
-- Style intensity slider.
-- Gear menu for API URL, API key, and model settings.
-- Operator style presets powered by reusable style archetypes.
-- Copy-to-clipboard output.
-- Local Node proxy for development.
-- Vercel API proxy for production.
-- Cloudflare Worker proxy kept as a GitHub Pages fallback.
+- 输入中文文本并转换为明日方舟式表达。
+- 基于 `DesignLanguage.txt` 的战术工业/HUD 风格界面。
+- 内置通用语气预设：
+  - 罗德岛终端
+  - 阿米娅式
+  - 凯尔希式
+  - W式
+  - 银灰式
+  - 能天使式
+- 支持大量干员风格预设，并提供搜索和筛选。
+- 可按干员名、阵营、职业、标签、风格模板检索。
+- 风格强度滑杆。
+- 小齿轮配置菜单，可配置 API URL、API Key、Model。
+- 一键复制转换结果。
+- 本地 Node 代理用于开发。
+- Vercel API 代理用于主生产环境。
+- Cloudflare Worker 作为 GitHub Pages fallback 保留。
 
-## Architecture
+## 架构
 
-Primary Vercel flow:
+主生产路径，也就是 Vercel：
 
 ```text
-Browser on Vercel
-  -> same-origin /api/transform
+浏览器访问 Vercel 页面
+  -> 同源 /api/transform
   -> OpenAI-compatible /chat/completions API
-  -> Browser receives the result
+  -> 浏览器收到结果
 ```
 
-Local development flow:
+本地开发路径：
 
 ```text
-Browser on http://127.0.0.1:4173
-  -> local Node server /api/transform
+浏览器访问 http://127.0.0.1:4173
+  -> 本地 Node 服务 /api/transform
   -> OpenAI-compatible /chat/completions API
-  -> Browser receives the result
+  -> 浏览器收到结果
 ```
 
-GitHub Pages fallback flow:
+GitHub Pages fallback 路径：
 
 ```text
-Browser on GitHub Pages
+浏览器访问 GitHub Pages
   -> Cloudflare Worker /api/transform
   -> OpenAI-compatible /chat/completions API
-  -> Browser receives the result
+  -> 浏览器收到结果
 ```
 
-`app.js` chooses the endpoint by host:
+`app.js` 会按当前页面域名选择 API endpoint：
 
-- `localhost` / `127.0.0.1`: local `/api/transform`
-- `*.github.io`: Cloudflare Worker fallback
-- other production hosts such as Vercel: same-origin `/api/transform`
+- `localhost` / `127.0.0.1`：使用本地 `/api/transform`
+- `*.github.io`：使用 Cloudflare Worker fallback
+- 其他生产域名，例如 Vercel：使用同源 `/api/transform`
 
-## Files
+## 文件说明
 
-- `index.html` - Main static page.
-- `styles.css` - Tactical industrial/HUD-style UI.
-- `app.js` - Browser interaction, settings menu, and endpoint selection.
-- `config.js` - Shared defaults, persona prompts, validation, and error messages.
-- `operatorStyles.js` - Operator style archetypes and operator persona data.
-- `api/transform.js` - Vercel Serverless Function API proxy.
-- `server.js` - Local development static server and API proxy.
-- `worker.js` - Cloudflare Worker API proxy for GitHub Pages fallback.
-- `vercel.json` - Vercel function configuration.
-- `wrangler.toml` - Cloudflare Worker deployment config.
-- `DesignLanguage.txt` - UI design reference notes.
+- `index.html`：主页面结构。
+- `styles.css`：战术工业/HUD 风格样式。
+- `app.js`：浏览器交互、设置菜单、干员搜索、endpoint 选择。
+- `config.js`：共享默认配置、通用预设、prompt、校验逻辑、错误文案。
+- `operatorStyles.js`：干员风格模板和干员数据。
+- `api/transform.js`：Vercel Serverless Function API 代理。
+- `server.js`：本地开发静态服务和 API 代理。
+- `worker.js`：Cloudflare Worker API 代理，用于 GitHub Pages fallback。
+- `vercel.json`：Vercel 函数配置。
+- `wrangler.toml`：Cloudflare Worker 部署配置。
+- `DesignLanguage.txt`：界面设计参考。
 
-## Operator Styles
+## 干员风格
 
-Operator presets are defined in `operatorStyles.js`.
+干员风格定义在 `operatorStyles.js`。
 
-The file separates reusable style archetypes from individual operator metadata:
+文件分为两层：
 
 ```text
-styleArchetypes -> broad tone templates
-operators        -> operator name, faction, class, rarity, tags, modifiers
+styleArchetypes -> 可复用的语气模板
+operators        -> 干员名、阵营、职业、稀有度、标签、修饰说明
 ```
 
-This keeps the project maintainable as the operator list grows. To add more operators, append entries to `operators` and reuse an existing `archetype` where possible. Only create a new archetype when the existing tone templates cannot describe the operator well.
+这样可以避免每个干员都写一大段完全独立的 prompt。新增干员时，优先复用已有 `archetype`，只有现有模板无法表达该干员风格时，再新增模板。
 
-The first batch includes representative operators such as Amiya, Kal'tsit, Ch'en, Exusiai, Texas, Lappland, SilverAsh, Surtr, Ling, Nian, Dusk, W, Ines, Eyjafjalla, Saria, Skadi the Corrupting Heart, Flametail, Mlynar, and Thorns.
+当前 UI 支持搜索式选择干员风格。可以搜索：
 
-## Settings
+- 干员名，例如 `凯尔希`、`重岳`
+- 阵营，例如 `罗德岛`、`拉特兰`、`卡西米尔`
+- 职业，例如 `近卫`、`医疗`、`狙击`
+- 标签，例如 `深海`、`骑士`、`毒理`、`审判`
+- 风格模板，例如 `poeticMystic`、`silentBlade`
 
-The page has a gear menu for runtime settings:
+选择器提供三个筛选入口：
+
+```text
+全部 / 通用 / 干员
+```
+
+这让干员数量继续增加时也能快速定位，而不是在超长下拉框里查找。
+
+## 设置菜单
+
+页面右上角的小齿轮菜单支持运行时配置：
 
 - API URL
 - API Key
 - Model
 
-The default configuration points to the Kenari OpenAI-compatible API. Settings are saved in `localStorage` and sent to the local server, Vercel function, or Worker with each conversion request.
+默认配置指向 Kenari 的 OpenAI-compatible API。设置会保存到浏览器 `localStorage`，每次转换时都会随请求发送给本地服务、Vercel 函数或 Worker。
 
-The Cloudflare Worker intentionally restricts accepted origins and API hosts so it does not become a general-purpose open proxy. Vercel runs same-origin in the primary deployment, so browser CORS is not involved there.
+Cloudflare Worker 会限制允许的来源和上游 API host，避免变成通用开放代理。Vercel 主部署是同源请求，不涉及浏览器 CORS 问题。
 
-## Local Development
+## 本地开发
 
-Requirements:
+要求：
 
-- Node.js 18 or newer.
+- Node.js 18 或更新版本。
 
-Run locally with the built-in Node server:
+启动本地服务：
 
 ```bash
 npm start
 ```
 
-Open:
+打开：
 
 ```text
 http://127.0.0.1:4173
 ```
 
-Run syntax checks:
+运行语法检查：
 
 ```bash
 npm run check
 ```
 
-Optional Vercel local development:
+可选：使用 Vercel 本地开发模式：
 
 ```bash
 npm run dev:vercel
 ```
 
-## Vercel Deployment
+## Vercel 部署
 
-Vercel should be linked to this GitHub repository. After linking, normal updates should be made by committing and pushing to GitHub; Vercel will automatically deploy the latest GitHub commit. You do not need to manually update Vercel first and GitHub second.
+Vercel 应连接到这个 GitHub 仓库。连接后，日常更新只需要提交并推送到 GitHub，Vercel 会自动部署最新提交。一般不需要先手动更新 Vercel 再更新 GitHub。
 
-Login:
+登录：
 
 ```bash
 npx vercel login
 ```
 
-First setup/deploy:
+第一次设置/部署：
 
 ```bash
 npx vercel
 ```
 
-Production deploy:
+生产部署：
 
 ```bash
 npx vercel --prod
 ```
 
-The production API endpoint is:
+生产 API endpoint：
 
 ```text
 /api/transform
 ```
 
-Because the frontend and API are same-origin on Vercel, this avoids the `workers.dev` access problem.
+因为 Vercel 上前端和 API 同源，所以主站不会遇到 `workers.dev` 难以访问的问题。
 
-## GitHub Update Flow
+## GitHub 日常更新流程
 
-For normal code changes:
+普通代码更新：
 
 ```bash
 git add .
@@ -185,40 +200,40 @@ git commit -m "Describe the change"
 git push
 ```
 
-If Vercel is linked to the GitHub repository, pushing to `main` triggers a new Vercel deployment automatically.
+如果 Vercel 已经和 GitHub 仓库关联，推送到 `main` 后会自动触发新部署。
 
-## Cloudflare Worker Fallback
+## Cloudflare Worker fallback
 
-The Cloudflare Worker remains available for the GitHub Pages fallback deployment.
+Cloudflare Worker 仍保留给 GitHub Pages fallback 使用。
 
-Deploy Worker manually:
+手动部署 Worker：
 
 ```bash
 npx wrangler deploy
 ```
 
-Current Worker URL:
+当前 Worker 地址：
 
 ```text
 https://arknights-style-converter-api.1421201386.workers.dev
 ```
 
-## GitHub Pages Fallback
+## GitHub Pages fallback
 
-GitHub Pages URL:
+GitHub Pages 地址：
 
 ```text
 https://huzaigong.github.io/arknights-style-converter/
 ```
 
-Check GitHub Pages status:
+检查 GitHub Pages 状态：
 
 ```bash
 gh api repos/HuZaiGong/arknights-style-converter/pages --jq '{html_url, status, source}'
 ```
 
-## Notes
+## 备注
 
-- API configuration is intentionally editable in the page settings menu.
-- The Vercel function and Worker return normalized error codes and user-facing Chinese messages instead of raw upstream responses.
-- The style prompt is inspired by Arknights-like tactical, medical, industrial, and terminal-report language. It asks the model not to quote official text or claim official origin.
+- API 配置有意暴露在页面设置菜单中，当前项目不把 API key 安全作为重点。
+- Vercel 函数和 Worker 都会返回统一错误码和面向用户的中文错误提示，不直接暴露上游原始响应。
+- prompt 只借鉴明日方舟式战术、医疗、工业、终端报告语感；要求模型不要引用官方台词，也不要声称输出来自官方。

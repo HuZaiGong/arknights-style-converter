@@ -449,6 +449,206 @@ export const operators = [
     archetype: "urbanOfficer",
     tags: ["审判", "秩序", "叙拉古"],
     modifiers: "更像法庭和街巷之间的裁决，强调罪责、证言和秩序代价。"
+  },
+  {
+    id: "op_skadi",
+    name: "斯卡蒂",
+    faction: "阿戈尔",
+    class: "近卫",
+    rarity: 6,
+    archetype: "silentBlade",
+    tags: ["深海", "孤独", "猎人"],
+    modifiers: "语气寡言、疏离，像独自走向深海猎场；强调距离、力量和沉默。"
+  },
+  {
+    id: "op_specter",
+    name: "幽灵鲨",
+    faction: "阿戈尔",
+    class: "近卫",
+    rarity: 5,
+    archetype: "poeticMystic",
+    tags: ["深海", "修女", "狂热"],
+    modifiers: "语气带宗教式低语和海潮般的不稳定，保持克制但有异样神秘感。"
+  },
+  {
+    id: "op_gladiia",
+    name: "歌蕾蒂娅",
+    faction: "阿戈尔",
+    class: "特种",
+    rarity: 6,
+    archetype: "nobleStrategist",
+    tags: ["深海猎人", "优雅", "指挥"],
+    modifiers: "语气优雅而锋利，像深海猎人的指挥官，带冷静的贵族式压迫。"
+  },
+  {
+    id: "op_lumen",
+    name: "流明",
+    faction: "伊比利亚",
+    class: "医疗",
+    rarity: 6,
+    archetype: "warmLeader",
+    tags: ["灯塔", "温和", "治愈"],
+    modifiers: "语气温柔、诚恳，像风暴中的灯塔和医疗记录，带稳定人心的光。"
+  },
+  {
+    id: "op_nearl",
+    name: "临光",
+    faction: "卡西米尔",
+    class: "重装",
+    rarity: 5,
+    archetype: "ironProtector",
+    tags: ["骑士", "守护", "光"],
+    modifiers: "语气正直、坚定，强调骑士准则、庇护和不退让的光。"
+  },
+  {
+    id: "op_nearl_alter",
+    name: "耀骑士临光",
+    faction: "卡西米尔",
+    class: "近卫",
+    rarity: 6,
+    archetype: "ferventWarrior",
+    tags: ["骑士", "光芒", "决意"],
+    modifiers: "语气更耀眼、更坚定，像公开宣告的骑士誓言和冲锋。"
+  },
+  {
+    id: "op_platinum",
+    name: "白金",
+    faction: "卡西米尔",
+    class: "狙击",
+    rarity: 5,
+    archetype: "silentBlade",
+    tags: ["狙击", "倦怠", "刺客"],
+    modifiers: "语气懒散但精准，像把目标放进准星后才开始认真。"
+  },
+  {
+    id: "op_fartooth",
+    name: "远牙",
+    faction: "卡西米尔",
+    class: "狙击",
+    rarity: 6,
+    archetype: "silentBlade",
+    tags: ["骑士", "远距", "专注"],
+    modifiers: "语气安静专注，强调距离、瞄准线和骑士竞技的孤独。"
+  },
+  {
+    id: "op_elysium",
+    name: "极境",
+    faction: "伊比利亚",
+    class: "先锋",
+    rarity: 5,
+    archetype: "cheerfulExecutor",
+    tags: ["通讯", "轻快", "支援"],
+    modifiers: "语气轻松、机敏，像战场通讯员在噪声中保持频道清晰。"
+  },
+  {
+    id: "op_weedy",
+    name: "温蒂",
+    faction: "伊比利亚",
+    class: "特种",
+    rarity: 6,
+    archetype: "gentleScholar",
+    tags: ["工程", "水炮", "洁癖"],
+    modifiers: "语气谨慎、精密，带工程测试、水压和环境控制的表达。"
+  },
+  {
+    id: "op_mizuki",
+    name: "水月",
+    faction: "东国",
+    class: "特种",
+    rarity: 6,
+    archetype: "poeticMystic",
+    tags: ["海嗣", "柔和", "异质"],
+    modifiers: "语气柔软、空灵，带水面、泡影和非人感，但保持可读。"
+  },
+  {
+    id: "op_greythroat",
+    name: "灰喉",
+    faction: "罗德岛",
+    class: "狙击",
+    rarity: 5,
+    archetype: "wearyVeteran",
+    tags: ["谨慎", "感染者", "防备"],
+    modifiers: "语气带戒备和克制，像不轻易信任却仍完成任务的狙击手。"
+  },
+  {
+    id: "op_meteorite",
+    name: "陨星",
+    faction: "罗德岛",
+    class: "狙击",
+    rarity: 5,
+    archetype: "wearyVeteran",
+    tags: ["萨卡兹", "爆破", "老练"],
+    modifiers: "语气老练、低沉，带爆破支援和萨卡兹佣兵的战场经验。"
+  },
+  {
+    id: "op_blue_poison",
+    name: "蓝毒",
+    faction: "罗德岛",
+    class: "狙击",
+    rarity: 5,
+    archetype: "gentleScholar",
+    tags: ["毒理", "温柔", "距离"],
+    modifiers: "语气柔和但带毒理学冷感，像把危险装进精确剂量。"
+  },
+  {
+    id: "op_lee",
+    name: "老鲤",
+    faction: "龙门",
+    class: "特种",
+    rarity: 6,
+    archetype: "wearyVeteran",
+    tags: ["世故", "侦探", "龙门"],
+    modifiers: "语气圆滑、世故，像街头侦探把麻烦说得轻描淡写。"
+  },
+  {
+    id: "op_mr_nothing",
+    name: "乌有",
+    faction: "炎国",
+    class: "特种",
+    rarity: 5,
+    archetype: "dangerousTrickster",
+    tags: ["江湖", "油滑", "话术"],
+    modifiers: "语气油滑、江湖气，带一点避重就轻的玩笑和算盘。"
+  },
+  {
+    id: "op_lin",
+    name: "林",
+    faction: "龙门",
+    class: "术师",
+    rarity: 6,
+    archetype: "urbanOfficer",
+    tags: ["龙门", "权谋", "冷静"],
+    modifiers: "语气冷静、干净，像在龙门权力缝隙中做出精确判断。"
+  },
+  {
+    id: "op_chongyue",
+    name: "重岳",
+    faction: "炎国",
+    class: "近卫",
+    rarity: 6,
+    archetype: "poeticMystic",
+    tags: ["武道", "师者", "山河"],
+    modifiers: "语气开阔、沉稳，带武道、山河和师者点拨的意味。"
+  },
+  {
+    id: "op_magallan",
+    name: "麦哲伦",
+    faction: "莱茵生命",
+    class: "辅助",
+    rarity: 6,
+    archetype: "gentleScholar",
+    tags: ["探索", "无人机", "极地"],
+    modifiers: "语气轻快而学术，像带着无人机穿越极地风雪的研究记录。"
+  },
+  {
+    id: "op_ceobe",
+    name: "刻俄柏",
+    faction: "罗德岛",
+    class: "术师",
+    rarity: 6,
+    archetype: "cheerfulExecutor",
+    tags: ["直觉", "荒野", "单纯"],
+    modifiers: "语气更直觉化、更有野外行动感，但避免过度幼稚。"
   }
 ];
 
@@ -463,6 +663,8 @@ export function buildOperatorPersona(operator) {
     faction: operator.faction,
     class: operator.class,
     rarity: operator.rarity,
+    archetype: operator.archetype,
+    tags: operator.tags || [],
     instruction: [
       archetype?.instruction || "保持明日方舟式克制、战术化、带有档案感的表达。",
       `参考干员：${operator.name}。阵营：${operator.faction}。职业：${operator.class}。稀有度：${operator.rarity}。`,

@@ -3,6 +3,10 @@ import { appDefaults, errorMessages, publicAppConfig } from "./config.js";
 const form = document.querySelector("#converterForm");
 const inputText = document.querySelector("#inputText");
 const personaSelect = document.querySelector("#personaSelect");
+const personaSearchInput = document.querySelector("#personaSearchInput");
+const personaFilterButtons = Array.from(document.querySelectorAll(".persona-filter"));
+const personaCurrent = document.querySelector("#personaCurrent");
+const personaResults = document.querySelector("#personaResults");
 const intensityRange = document.querySelector("#intensityRange");
 const intensityValue = document.querySelector("#intensityValue");
 const submitButton = document.querySelector("#submitButton");
@@ -29,33 +33,101 @@ const TRANSFORM_ENDPOINT = isGitHubPages
   : (isLocalhost ? LOCAL_ENDPOINT : config.vercelEndpoint);
 const SETTINGS_KEY = "arknights-style-converter-settings";
 const sampleText = "今天的事情很多，但我会尽力处理完。请大家先保持冷静，等我把重要事项排好顺序。";
+let selectedPersonaId = "terminal";
+let personaSearchQuery = "";
+let personaCategoryFilter = "all";
 let currentResult = "";
 
-function renderPersonaOptions() {
+function personaMeta(persona) {
+  const meta = [];
+  if (persona.faction) meta.push(persona.faction);
+  if (persona.class) meta.push(persona.class);
+  if (persona.rarity) meta.push(`${persona.rarity}★`);
+  return meta.join(" · ");
+}
+
+function personaSearchText(persona) {
+  return [
+    persona.name,
+    persona.group,
+    persona.faction,
+    persona.class,
+    persona.archetype,
+    ...(persona.tags || [])
+  ].filter(Boolean).join(" ").toLowerCase();
+}
+
+function filteredPersonas() {
+  const query = personaSearchQuery.trim().toLowerCase();
+
+  return config.personas.filter(persona => {
+    const isOperator = persona.group === "干员风格";
+    if (personaCategoryFilter === "base" && isOperator) return false;
+    if (personaCategoryFilter === "operator" && !isOperator) return false;
+    if (!query) return true;
+    return personaSearchText(persona).includes(query);
+  });
+}
+
+function syncPersonaSelect() {
   personaSelect.innerHTML = "";
-  const groups = new Map();
-
   for (const persona of config.personas) {
-    const groupName = persona.group || "通用预设";
-    if (!groups.has(groupName)) groups.set(groupName, []);
-    groups.get(groupName).push(persona);
+    const option = document.createElement("option");
+    option.value = persona.id;
+    option.textContent = persona.name;
+    personaSelect.append(option);
+  }
+  personaSelect.value = selectedPersonaId;
+}
+
+function selectPersona(personaId) {
+  const persona = config.personas.find(item => item.id === personaId) || config.personas[0];
+  selectedPersonaId = persona.id;
+  personaSelect.value = persona.id;
+  personaCurrent.textContent = persona.group === "干员风格" && persona.faction
+    ? `${persona.name} / ${personaMeta(persona)}`
+    : persona.name;
+  renderPersonaResults();
+}
+
+function renderPersonaResults() {
+  const results = filteredPersonas();
+  personaResults.innerHTML = "";
+
+  if (!results.length) {
+    const empty = document.createElement("div");
+    empty.className = "persona-empty";
+    empty.textContent = "未找到匹配的语气预设";
+    personaResults.append(empty);
+    return;
   }
 
-  for (const [groupName, items] of groups) {
-    const optionGroup = document.createElement("optgroup");
-    optionGroup.label = groupName;
+  for (const persona of results) {
+    const item = document.createElement("button");
+    item.type = "button";
+    item.className = `persona-result${persona.id === selectedPersonaId ? " is-selected" : ""}`;
+    item.setAttribute("role", "option");
+    item.setAttribute("aria-selected", String(persona.id === selectedPersonaId));
+    item.dataset.personaId = persona.id;
 
-    for (const persona of items) {
-      const option = document.createElement("option");
-      option.value = persona.id;
-      option.textContent = persona.group === "干员风格" && persona.faction
-        ? `${persona.name} / ${persona.faction}`
-        : persona.name;
-      optionGroup.append(option);
-    }
+    const title = document.createElement("strong");
+    title.textContent = persona.name;
+    item.append(title);
 
-    personaSelect.append(optionGroup);
+    const meta = document.createElement("span");
+    meta.textContent = persona.group === "干员风格"
+      ? [personaMeta(persona), ...(persona.tags || []).slice(0, 3)].filter(Boolean).join(" · ")
+      : persona.group;
+    item.append(meta);
+
+    item.addEventListener("click", () => selectPersona(persona.id));
+    personaResults.append(item);
   }
+}
+
+function renderPersonaOptions() {
+  syncPersonaSelect();
+  selectPersona(selectedPersonaId);
 }
 
 function defaultSettings() {
@@ -167,7 +239,7 @@ async function transformText(event) {
       },
       body: JSON.stringify({
         text,
-        persona: personaSelect.value,
+        persona: selectedPersonaId,
         intensity: intensityRange.value,
         ...loadSettings()
       })
@@ -214,6 +286,17 @@ async function copyResult() {
 }
 
 form.addEventListener("submit", transformText);
+personaSearchInput.addEventListener("input", () => {
+  personaSearchQuery = personaSearchInput.value;
+  renderPersonaResults();
+});
+personaFilterButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    personaCategoryFilter = button.dataset.filter || "all";
+    personaFilterButtons.forEach(item => item.classList.toggle("is-active", item === button));
+    renderPersonaResults();
+  });
+});
 inputText.addEventListener("input", updateInputStats);
 intensityRange.addEventListener("input", () => {
   intensityValue.textContent = intensityRange.value;

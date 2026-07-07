@@ -204,7 +204,9 @@ export function personaOptions() {
     group: persona.group || "通用预设",
     faction: persona.faction || "",
     class: persona.class || "",
-    rarity: persona.rarity || null
+    rarity: persona.rarity || null,
+    tags: persona.tags || [],
+    archetype: persona.archetype || ""
   }));
 }
 

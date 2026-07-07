@@ -73,10 +73,18 @@
           </div>
 
           <div class="control-grid">
-            <label class="control-block" for="personaSelect">
+            <div class="control-block persona-control">
               <span>语气预设</span>
-              <select id="personaSelect" name="persona"></select>
-            </label>
+              <input class="persona-search" id="personaSearchInput" type="search" placeholder="搜索干员、阵营、职业或标签" autocomplete="off">
+              <div class="persona-filters" aria-label="语气分类筛选">
+                <button class="persona-filter is-active" type="button" data-filter="all">全部</button>
+                <button class="persona-filter" type="button" data-filter="base">通用</button>
+                <button class="persona-filter" type="button" data-filter="operator">干员</button>
+              </div>
+              <div class="persona-current" id="personaCurrent">罗德岛终端</div>
+              <div class="persona-results" id="personaResults" role="listbox" aria-label="语气预设结果"></div>
+              <select class="sr-only" id="personaSelect" name="persona" aria-hidden="true" tabindex="-1"></select>
+            </div>
             <label class="control-block" for="intensityRange">
               <span>风格强度 <b id="intensityValue">65</b></span>
               <input id="intensityRange" name="intensity" type="range" min="10" max="100" value="65">
