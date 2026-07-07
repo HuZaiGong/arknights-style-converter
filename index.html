@@ -16,10 +16,41 @@
             <h1 id="page-title">罗德岛式文风转换终端</h1>
             <p class="brief">输入一句普通表达，终端会将其重构为更明日方舟式的中文。</p>
           </div>
-          <div class="status-board" aria-label="终端状态">
-            <div><span>API</span><strong>ONLINE</strong></div>
-            <div><span>FORMAT</span><strong>CHAT</strong></div>
-            <div><span>MODE</span><strong>STYLE</strong></div>
+          <div class="status-board-wrap">
+            <button class="settings-trigger" type="button" id="settingsButton" aria-expanded="false" aria-controls="settingsPanel" title="配置">
+              <span aria-hidden="true">⚙</span>
+              <span class="sr-only">配置</span>
+            </button>
+            <div class="settings-panel" id="settingsPanel" hidden>
+              <div class="settings-head">
+                <span>CONFIG</span>
+                <strong>API</strong>
+              </div>
+              <form id="settingsForm">
+                <label class="settings-field" for="apiUrlInput">
+                  <span>API URL</span>
+                  <input id="apiUrlInput" name="apiBaseUrl" type="url" autocomplete="off" spellcheck="false">
+                </label>
+                <label class="settings-field" for="apiKeyInput">
+                  <span>API Key</span>
+                  <input id="apiKeyInput" name="apiKey" type="password" autocomplete="off" spellcheck="false">
+                </label>
+                <label class="settings-field" for="modelInput">
+                  <span>Model</span>
+                  <input id="modelInput" name="model" type="text" autocomplete="off" spellcheck="false">
+                </label>
+                <div class="settings-actions">
+                  <button class="copy-button" type="button" id="resetSettingsButton">默认</button>
+                  <button class="text-button" type="submit">保存</button>
+                </div>
+                <p class="settings-status" id="settingsStatus"></p>
+              </form>
+            </div>
+            <div class="status-board" aria-label="终端状态">
+              <div><span>API</span><strong>ONLINE</strong></div>
+              <div><span>FORMAT</span><strong>CHAT</strong></div>
+              <div><span>MODE</span><strong>STYLE</strong></div>
+            </div>
           </div>
         </div>
       </section>
@@ -81,6 +112,6 @@
       </section>
     </main>
 
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
   </body>
 </html>

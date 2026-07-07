@@ -1,6 +1,8 @@
 {
+  "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "check": "node --check config.js && node --check app.js && node --check server.js && node --check worker.js"
   },
   "engines": {
     "node": ">=18"

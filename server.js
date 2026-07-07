@@ -1,50 +1,23 @@
-const http = require("http");
-const fs = require("fs/promises");
-const path = require("path");
+import http from "node:http";
+import fs from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  appDefaults,
+  buildPrompt,
+  classifyUpstreamError,
+  extractChoiceText,
+  makeError,
+  validateApiBaseUrl,
+  validateTransformPayload
+} from "./config.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const HOST = "127.0.0.1";
 const PORT = Number(process.env.PORT || 4173);
-
-const API_BASE_URL = "https://kenari.id/v1";
-const API_KEY = "kn-1f8111f1f7d17bd76aae6bae01a90fc4188ff278b2ac4190";
-const MODEL = "deepseek-v4-flash:free";
-
 const PUBLIC_DIR = __dirname;
-const MAX_INPUT_LENGTH = 4000;
-const MAX_OUTPUT_TOKENS = 2400;
-
-const personas = {
-  terminal: {
-    name: "罗德岛终端",
-    instruction:
-      "像罗德岛作战终端的系统通报一样表达：冷静、克制、信息密度高，带有战术任务、医疗企业和灾害现场的语感。"
-  },
-  amiya: {
-    name: "阿米娅式",
-    instruction:
-      "语气温和、坚定、带有责任感和同理心；措辞像年轻指挥者在压力下仍努力保持清晰。"
-  },
-  kaltsit: {
-    name: "凯尔希式",
-    instruction:
-      "语气理性、冷淡、略带审判感；句子更长，带有医学、历史、风险评估和因果推断的表达。"
-  },
-  w: {
-    name: "W式",
-    instruction:
-      "语气轻佻、挑衅、危险但不粗俗；像在爆炸前留下玩笑，保留一点漫不经心的威胁感。"
-  },
-  silverash: {
-    name: "银灰式",
-    instruction:
-      "语气沉稳、贵族式、战略家口吻；强调筹码、局势、盟约和长期利益，措辞礼貌但有压迫感。"
-  },
-  exusiai: {
-    name: "能天使式",
-    instruction:
-      "语气轻快、直率、有行动力；保留乐观节奏，但仍套入罗德岛任务与城市危机的语境。"
-  }
-};
 
 const mimeTypes = {
   ".html": "text/html; charset=utf-8",
@@ -63,15 +36,23 @@ function sendJson(res, statusCode, payload) {
   res.end(JSON.stringify(payload));
 }
 
+function sendError(res, error) {
+  sendJson(res, error.status || 500, {
+    ok: false,
+    code: error.code,
+    message: error.message
+  });
+}
+
 function readRequestBody(req) {
   return new Promise((resolve, reject) => {
     let body = "";
 
     req.on("data", chunk => {
       body += chunk;
-      if (body.length > 64 * 1024) {
+      if (Buffer.byteLength(body, "utf8") > appDefaults.maxBodyBytes) {
+        reject(makeError("body_too_large", 413));
         req.destroy();
-        reject(new Error("请求体过大"));
       }
     });
 
@@ -80,92 +61,25 @@ function readRequestBody(req) {
   });
 }
 
-function buildPrompt({ text, personaKey, intensity }) {
-  const persona = personas[personaKey] || personas.terminal;
-  const normalizedIntensity = Math.min(100, Math.max(0, Number(intensity) || 65));
-  const intensityGuide =
-    normalizedIntensity < 35
-      ? "轻度改写：保留原意和日常可读性，只加入少量战术工业与罗德岛终端质感。"
-      : normalizedIntensity < 75
-        ? "中度改写：明显提升明日方舟式冷峻叙事、任务口吻和末世城市氛围，但不要让句子难懂。"
-        : "高度改写：强化档案、作战简报、危机通告、角色语气和压迫感，可适度重组句子。";
-
-  return [
-    {
-      role: "system",
-      content: [
-        "你是一个中文文本风格转换器。",
-        "目标：把用户输入改写成受《明日方舟》启发的表达风格。",
-        "风格关键词：罗德岛、作战记录、终端通报、矿石病、灾害预警、移动城市、冷峻工业、克制情绪、战术报告。",
-        "要求：只输出改写后的文本，不解释过程，不添加标题，不引用或复刻原作台词，不声称文本来自官方。",
-        "保持用户原意；不要加入用户没有表达的实质事实；如果原文是问题，改写后仍保持问题意图。",
-        `当前预设：${persona.name}。${persona.instruction}`,
-        intensityGuide
-      ].join("\n")
-    },
-    {
-      role: "user",
-      content: `请改写这段话：\n${text}`
-    }
-  ];
-}
-
-function extractChoiceText(data) {
-  const choice = data.choices?.[0];
-  const content = choice?.message?.content;
-
-  if (typeof content === "string") return content.trim();
-  if (Array.isArray(content)) {
-    return content
-      .map(part => typeof part === "string" ? part : part?.text || "")
-      .join("")
-      .trim();
-  }
-  if (typeof choice?.text === "string") return choice.text.trim();
-  if (typeof data.output_text === "string") return data.output_text.trim();
-
-  return "";
-}
-
-async function handleTransform(req, res) {
-  let payload;
+async function callChatCompletion({ text, personaKey, intensity, apiBaseUrl, apiKey, model }) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), appDefaults.requestTimeoutMs);
 
   try {
-    const body = await readRequestBody(req);
-    payload = JSON.parse(body || "{}");
-  } catch (error) {
-    sendJson(res, 400, { error: "请求 JSON 无法解析。" });
-    return;
-  }
-
-  const text = String(payload.text || "").trim();
-  const personaKey = String(payload.persona || "terminal");
-  const intensity = Number(payload.intensity ?? 65);
-
-  if (!text) {
-    sendJson(res, 400, { error: "请输入需要转换的内容。" });
-    return;
-  }
-
-  if (text.length > MAX_INPUT_LENGTH) {
-    sendJson(res, 400, { error: `输入过长，请控制在 ${MAX_INPUT_LENGTH} 字以内。` });
-    return;
-  }
-
-  try {
-    const apiRes = await fetch(`${API_BASE_URL}/chat/completions`, {
+    const apiRes = await fetch(`${apiBaseUrl}/chat/completions`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${API_KEY}`,
+        "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: MODEL,
+        model,
         messages: buildPrompt({ text, personaKey, intensity }),
-        temperature: 0.82,
-        max_tokens: MAX_OUTPUT_TOKENS,
+        temperature: appDefaults.temperature,
+        max_tokens: appDefaults.maxOutputTokens,
         stream: false
-      })
+      }),
+      signal: controller.signal
     });
 
     const responseText = await apiRes.text();
@@ -178,21 +92,61 @@ async function handleTransform(req, res) {
     }
 
     if (!apiRes.ok) {
-      const message = data.error?.message || data.message || responseText || `API 请求失败：${apiRes.status}`;
-      sendJson(res, 502, { error: message });
-      return;
+      throw classifyUpstreamError(apiRes.status, data);
     }
 
     const result = extractChoiceText(data);
-
     if (!result) {
-      sendJson(res, 502, { error: "API 没有返回可用文本。", detail: data });
-      return;
+      throw makeError("upstream_empty", 502);
     }
 
-    sendJson(res, 200, { result, model: data.model || MODEL });
+    return { ok: true, result, model: data.model || model };
   } catch (error) {
-    sendJson(res, 502, { error: `无法连接转换 API：${error.message}` });
+    if (error.name === "AbortError") {
+      throw makeError("upstream_timeout", 504);
+    }
+    if (error?.code && error?.message) {
+      throw error;
+    }
+    throw makeError("network_error", 502);
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function handleTransform(req, res) {
+  if (!String(req.headers["content-type"] || "").includes("application/json")) {
+    sendError(res, makeError("bad_content_type", 415));
+    return;
+  }
+
+  let payload;
+
+  try {
+    const body = await readRequestBody(req);
+    payload = JSON.parse(body || "{}");
+  } catch (error) {
+    sendError(res, error?.code ? error : makeError("bad_json", 400));
+    return;
+  }
+
+  const validation = validateTransformPayload(payload);
+  if (validation.error) {
+    sendError(res, validation.error);
+    return;
+  }
+
+  const apiUrlError = validateApiBaseUrl(validation.value.apiBaseUrl);
+  if (apiUrlError) {
+    sendError(res, apiUrlError);
+    return;
+  }
+
+  try {
+    const result = await callChatCompletion(validation.value);
+    sendJson(res, 200, result);
+  } catch (error) {
+    sendError(res, error);
   }
 }
 
@@ -223,7 +177,9 @@ async function serveStatic(req, res) {
 }
 
 const server = http.createServer((req, res) => {
-  if (req.method === "POST" && req.url === "/api/transform") {
+  const requestUrl = new URL(req.url, `http://${req.headers.host}`);
+
+  if (req.method === "POST" && requestUrl.pathname === "/api/transform") {
     handleTransform(req, res);
     return;
   }
@@ -233,7 +189,7 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  sendJson(res, 405, { error: "Method Not Allowed" });
+  sendError(res, makeError("method_not_allowed", 405));
 });
 
 server.listen(PORT, HOST, () => {

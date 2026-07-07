@@ -1,3 +1,5 @@
+import { appDefaults, errorMessages, publicAppConfig } from "./config.js";
+
 const form = document.querySelector("#converterForm");
 const inputText = document.querySelector("#inputText");
 const personaSelect = document.querySelector("#personaSelect");
@@ -9,14 +11,78 @@ const errorLine = document.querySelector("#errorLine");
 const charCount = document.querySelector("#charCount");
 const copyButton = document.querySelector("#copyButton");
 const sampleButton = document.querySelector("#sampleButton");
+const settingsButton = document.querySelector("#settingsButton");
+const settingsPanel = document.querySelector("#settingsPanel");
+const settingsForm = document.querySelector("#settingsForm");
+const apiUrlInput = document.querySelector("#apiUrlInput");
+const apiKeyInput = document.querySelector("#apiKeyInput");
+const modelInput = document.querySelector("#modelInput");
+const resetSettingsButton = document.querySelector("#resetSettingsButton");
+const settingsStatus = document.querySelector("#settingsStatus");
 
-const WORKER_ENDPOINT = "https://arknights-style-converter-api.1421201386.workers.dev/api/transform";
+const config = publicAppConfig();
 const LOCAL_ENDPOINT = "/api/transform";
 const TRANSFORM_ENDPOINT = ["localhost", "127.0.0.1"].includes(window.location.hostname)
   ? LOCAL_ENDPOINT
-  : WORKER_ENDPOINT;
+  : config.workerEndpoint;
+const SETTINGS_KEY = "arknights-style-converter-settings";
 const sampleText = "今天的事情很多，但我会尽力处理完。请大家先保持冷静，等我把重要事项排好顺序。";
 let currentResult = "";
+
+function defaultSettings() {
+  return {
+    apiBaseUrl: config.defaultApiBaseUrl,
+    apiKey: config.defaultApiKey,
+    model: config.defaultModel
+  };
+}
+
+function loadSettings() {
+  try {
+    return { ...defaultSettings(), ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}") };
+  } catch (error) {
+    return defaultSettings();
+  }
+}
+
+function saveSettings(settings) {
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+}
+
+function fillSettingsForm(settings = loadSettings()) {
+  apiUrlInput.value = settings.apiBaseUrl;
+  apiKeyInput.value = settings.apiKey;
+  modelInput.value = settings.model;
+}
+
+function readSettingsForm() {
+  return {
+    apiBaseUrl: apiUrlInput.value.trim() || appDefaults.apiBaseUrl,
+    apiKey: apiKeyInput.value.trim() || appDefaults.apiKey,
+    model: modelInput.value.trim() || appDefaults.model
+  };
+}
+
+function setSettingsStatus(message) {
+  settingsStatus.textContent = message || "";
+}
+
+function toggleSettings(forceOpen) {
+  const isOpen = typeof forceOpen === "boolean" ? forceOpen : settingsPanel.hidden;
+  settingsPanel.hidden = !isOpen;
+  settingsButton.setAttribute("aria-expanded", String(isOpen));
+  if (isOpen) {
+    apiUrlInput.focus();
+  }
+}
+
+function userMessageFromError(data, fallback) {
+  if (data?.message) return data.message;
+  if (data?.code && errorMessages[data.code]) return errorMessages[data.code];
+  if (data?.error?.message) return data.error.message;
+  if (typeof data?.error === "string") return data.error;
+  return fallback || errorMessages.network_error;
+}
 
 function setBusy(isBusy) {
   submitButton.disabled = isBusy;
@@ -47,7 +113,7 @@ function setError(message) {
 }
 
 function updateInputStats() {
-  charCount.textContent = `${inputText.value.length} / 4000`;
+  charCount.textContent = `${inputText.value.length} / ${config.maxInputLength}`;
 }
 
 async function transformText(event) {
@@ -55,7 +121,7 @@ async function transformText(event) {
 
   const text = inputText.value.trim();
   if (!text) {
-    setError("请输入需要转换的内容。");
+    setError(errorMessages.empty_input);
     inputText.focus();
     return;
   }
@@ -73,7 +139,8 @@ async function transformText(event) {
       body: JSON.stringify({
         text,
         persona: personaSelect.value,
-        intensity: intensityRange.value
+        intensity: intensityRange.value,
+        ...loadSettings()
       })
     });
 
@@ -87,17 +154,17 @@ async function transformText(event) {
     }
 
     if (!response.ok) {
-      throw new Error(data.error || data.message || responseText || "转换失败。");
+      throw new Error(userMessageFromError(data, errorMessages.upstream_error));
     }
 
     if (!data.result) {
-      throw new Error("API 没有返回可用文本。");
+      throw new Error(errorMessages.upstream_empty);
     }
 
     setResult(data.result);
   } catch (error) {
     setResult("");
-    setError(error.message || "转换失败，请检查 Worker 代理配置。");
+    setError(error.message || errorMessages.network_error);
   } finally {
     setBusy(false);
   }
@@ -129,5 +196,30 @@ sampleButton.addEventListener("click", () => {
   setError("");
   inputText.focus();
 });
+settingsButton.addEventListener("click", () => toggleSettings());
+settingsForm.addEventListener("submit", event => {
+  event.preventDefault();
+  saveSettings(readSettingsForm());
+  setSettingsStatus("配置已保存");
+  window.setTimeout(() => setSettingsStatus(""), 1600);
+});
+resetSettingsButton.addEventListener("click", () => {
+  const settings = defaultSettings();
+  saveSettings(settings);
+  fillSettingsForm(settings);
+  setSettingsStatus("已恢复默认配置");
+  window.setTimeout(() => setSettingsStatus(""), 1600);
+});
+document.addEventListener("click", event => {
+  if (settingsPanel.hidden) return;
+  if (settingsPanel.contains(event.target) || settingsButton.contains(event.target)) return;
+  toggleSettings(false);
+});
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") {
+    toggleSettings(false);
+  }
+});
 
+fillSettingsForm();
 updateInputStats();

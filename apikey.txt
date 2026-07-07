@@ -1,3 +1,0 @@
-url:kn-1f8111f1f7d17bd76aae6bae01a90fc4188ff278b2ac4190
-key:https://kenari.id/v1
-openai chat completions格式
